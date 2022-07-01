@@ -1,0 +1,33 @@
+{
+  "name": "aphrodite",
+  "version": "0.1.0",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc && cdk synth",
+    "watch": "tsc -w",
+    "test": "jest",
+    "lint": "eslint --ext .ts lib/ --fix --ignore-pattern \"*.d.ts\" && eslint --ext .ts bin/ --fix --ignore-pattern \"*.d.ts\"",
+    "dependencies": "rm -rf requirements && pip install -r requirements.txt -t requirements/",
+    "win-deps": "build_scripts\\win-deps.sh",
+    "update-docs": "sphinx-build -b html ./docs ./docs/build/"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.10",
+    "@types/node": "10.17.27",
+    "@typescript-eslint/eslint-plugin": "^5.11.0",
+    "@typescript-eslint/parser": "^5.11.0",
+    "aws-cdk-lib": "^2.22.0",
+    "constructs": "^10.0.0",
+    "eslint": "^8.9.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.4",
+    "jest": "^26.4.2",
+    "ts-jest": "^26.2.0",
+    "typescript": "~3.9.7"
+  },
+  "peerDependencies": {
+    "aws-cdk-lib": "2.22.0",
+    "constructs": "^10.0.0"
+  }
+}
