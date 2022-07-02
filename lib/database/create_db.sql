@@ -7,8 +7,8 @@ drop table if exists aphrodite.users;
 
 create table aphrodite.users
 (
-    user_hash varchar(256),
-    created_timestamp timestamp,
+    user_hash         varchar(256),
+    created_timestamp timestamp default now(),
     primary key (user_hash)
 );
 
@@ -16,26 +16,26 @@ create index users_created_timestamp on aphrodite.users (created_timestamp);
 
 create table aphrodite.marker_types
 (
-    marker_type_id bigint,
+    marker_type_id   bigint,
     marker_type_name varchar(20),
     primary key (marker_type_id)
 );
 
 create table aphrodite.operations
 (
-    operation_id bigint,
+    operation_id   bigint,
     operation_name varchar(20),
     primary key (operation_id)
 );
 
 create table aphrodite.markers
 (
-    marker_id bigint,
-    created_timestamp timestamp,
-    user_hash varchar(256),
-    marker_date date,
-    operation_id bigint,
-    marker_type_id bigint,
+    marker_id         bigint,
+    created_timestamp timestamp default now(),
+    user_hash         varchar(256),
+    marker_date       date,
+    operation_id      bigint,
+    marker_type_id    bigint,
     primary key (marker_id)
 );
 

@@ -1,0 +1,5 @@
+coverage
+pytest
+pg8000
+sqlalchemy
+boto3
