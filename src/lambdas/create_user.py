@@ -12,7 +12,7 @@ def create_user(_, __):
 
         conn = get_conn(os.environ.get('SecretName'))
 
-        insert_query = f''' insert into aphrodite.users (user_hash) values ('{user_hash}') '''
+        insert_query = f'''insert into aphrodite.users (user_hash) values ('{user_hash}')'''
 
         get_query_results(conn, insert_query)
 
