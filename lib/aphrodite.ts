@@ -13,9 +13,9 @@ export default class Aphrodite extends Construct {
         let domainName = '';
 
         if (Constants.getStageName() === 'beta') {
-            domainName = 'betacontrol.ksco92.com';
+            domainName = `${Constants.getStageName()}aphrodite.ksco92.com`;
         } else {
-            domainName = 'control.ksco92.com';
+            domainName = 'aphrodite.ksco92.com';
         }
 
         const vpc = makeVpc(this);
