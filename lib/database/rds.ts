@@ -77,7 +77,7 @@ export default function makeRds(
         enableDataApi: true,
         removalPolicy: RemovalPolicy.DESTROY,
         scaling: {
-            minCapacity: AuroraCapacityUnit.ACU_1,
+            minCapacity: AuroraCapacityUnit.ACU_2,
             maxCapacity: AuroraCapacityUnit.ACU_4,
         },
         securityGroups: [
