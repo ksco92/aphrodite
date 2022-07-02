@@ -17,7 +17,7 @@ export default class PipelineStack extends Stack {
             synth: new CodeBuildStep('SynthStep', {
                 input: CodePipelineSource.connection(
                     'ksco92/aphrodite',
-                    'master',
+                    'main',
                     {
                         connectionArn:
                             `arn:aws:codestar-connections:${Stack.of(this).region}:${Stack.of(this).account}:connection/${Constants.getCodeStarId()}`,
