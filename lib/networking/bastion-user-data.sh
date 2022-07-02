@@ -25,4 +25,4 @@ bind 0.0.0.0:<actual_postgres_port>
 EOL'
 
 sudo service haproxy restart
-systemctl start haproxy
+sudo systemctl start haproxy

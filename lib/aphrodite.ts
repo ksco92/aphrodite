@@ -33,5 +33,10 @@ export default class Aphrodite extends Construct {
         // Allow SSH from anywhere
         bastion.bastionSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(22));
         bastion.bastionSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(rds.rdsClusterPort));
+
+        rds.rdsSecurityGroup.addIngressRule(
+            bastion.bastionSecurityGroup,
+            Port.tcp(rds.rdsClusterPort)
+        );
     }
 }
