@@ -5,6 +5,7 @@ import makeHostedZones from './networking/hosted-zones';
 import Constants from './constants';
 import makeRds from './database/rds';
 import makeBastion from './networking/bastion';
+import makeLambda from "./lambda/lambda";
 
 export default class Aphrodite extends Construct {
     constructor(scope: Construct, id: string) {
@@ -19,8 +20,11 @@ export default class Aphrodite extends Construct {
         }
 
         const vpc = makeVpc(this);
+
         const hostedZones = makeHostedZones(this, domainName);
+
         const rds = makeRds(this, vpc, hostedZones.publicHostedZone);
+
         const bastion = makeBastion(
             this,
             vpc,
@@ -30,6 +34,8 @@ export default class Aphrodite extends Construct {
             hostedZones.publicHostedZone
         );
 
+        const lambda = makeLambda(this, vpc);
+
         // Allow SSH from anywhere
         bastion.bastionSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(22));
         bastion.bastionSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(rds.rdsClusterPort));
@@ -38,5 +44,12 @@ export default class Aphrodite extends Construct {
             bastion.bastionSecurityGroup,
             Port.tcp(rds.rdsClusterPort)
         );
+
+        rds.rdsSecurityGroup.addIngressRule(
+            lambda.lambdaSecurityGroup,
+            Port.tcp(rds.rdsClusterPort)
+        );
+
+        rds.rdsSecret.grantRead(lambda.lambdaRole);
     }
 }
