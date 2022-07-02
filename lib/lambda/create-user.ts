@@ -15,7 +15,7 @@ export default function makeCreateUser(
     lambdaSecurityGroup: SecurityGroup,
     requirementsLayer: LayerVersion
 ) {
-    return new Function(scope, `${Constants.APP_NAME}${Constants.getStageName()}ControlLambdaLoader`, {
+    return new Function(scope, `${Constants.APP_NAME}${Constants.getStageName()}AphroditeCreateUser`, {
         code: Code.fromAsset(path.join(__dirname, '../../src')),
         runtime: Runtime.PYTHON_3_9,
         handler: 'lambdas.create_user.create_user',

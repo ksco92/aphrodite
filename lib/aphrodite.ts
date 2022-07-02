@@ -54,5 +54,6 @@ export default class Aphrodite extends Construct {
         );
 
         rds.rdsSecret.grantRead(lambda.lambdaRole);
+        rds.rdsCluster.grantDataApiAccess(lambda.lambdaRole);
     }
 }
