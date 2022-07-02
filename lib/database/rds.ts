@@ -3,10 +3,9 @@ import {SecurityGroup, SubnetType, Vpc} from 'aws-cdk-lib/aws-ec2';
 import {HostedZone} from 'aws-cdk-lib/aws-route53';
 import {Key} from 'aws-cdk-lib/aws-kms';
 import {
-    AuroraCapacityUnit, AuroraEngineVersion, AuroraPostgresEngineVersion,
+    AuroraCapacityUnit,
     Credentials,
     DatabaseClusterEngine,
-    ParameterGroup,
     ServerlessCluster,
     SubnetGroup,
 } from 'aws-cdk-lib/aws-rds';
@@ -64,35 +63,16 @@ export default function makeRds(
     // //////////////////////////////////////////////
     // //////////////////////////////////////////////
     // //////////////////////////////////////////////
-    // Configuration
-
-    const rdsParameterGroup = new ParameterGroup(scope, `${Constants.APP_NAME}${Constants.getStageName()}RDSParameterGroup`, {
-        engine: DatabaseClusterEngine.auroraPostgres({
-            version: AuroraPostgresEngineVersion.VER_13_6,
-        }),
-        parameters: {
-            max_connections: '10000',
-            password_encryption: 'md5',
-        },
-    });
-
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
     // DB instance
 
     const rdsClusterPort = 5432;
 
     const rdsCluster = new ServerlessCluster(scope, `${Constants.APP_NAME}${Constants.getStageName()}RDSServerlessCluster`, {
-        engine: DatabaseClusterEngine.auroraPostgres({
-            version: AuroraPostgresEngineVersion.VER_13_6,
-        }),
+        engine: DatabaseClusterEngine.AURORA_POSTGRESQL,
         clusterIdentifier: `${Constants.APP_NAME}${Constants.getStageName()}RDSServerlessCluster`,
         credentials: Credentials.fromSecret(rdsSecret),
         defaultDatabaseName: `${Constants.APP_NAME}${Constants.getStageName()}`,
         enableDataApi: true,
-        parameterGroup: rdsParameterGroup,
         removalPolicy: RemovalPolicy.DESTROY,
         scaling: {
             minCapacity: AuroraCapacityUnit.ACU_1,
