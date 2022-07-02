@@ -1,13 +1,14 @@
 import {Construct} from 'constructs';
-import {SecurityGroup, SubnetType, Vpc} from 'aws-cdk-lib/aws-ec2';
+import {
+    InstanceClass, InstanceSize, InstanceType, SecurityGroup, SubnetType, Vpc,
+} from 'aws-cdk-lib/aws-ec2';
 import {HostedZone} from 'aws-cdk-lib/aws-route53';
 import {Key} from 'aws-cdk-lib/aws-kms';
 import {
-    AuroraCapacityUnit,
-    Credentials,
+    AuroraPostgresEngineVersion,
+    DatabaseCluster,
     DatabaseClusterEngine,
     ParameterGroup,
-    ServerlessCluster,
     SubnetGroup,
 } from 'aws-cdk-lib/aws-rds';
 import {Secret} from 'aws-cdk-lib/aws-secretsmanager';
@@ -60,6 +61,16 @@ export default function makeRds(
         securityGroupName: `${Constants.APP_NAME}${Constants.getStageName()}RDSSecurityGroup`,
     });
 
+    const rdsParameterGroup = new ParameterGroup(scope, `${Constants.APP_NAME}${Constants.getStageName()}RDSParameterGroup`, {
+        engine: DatabaseClusterEngine.auroraPostgres({
+            version: AuroraPostgresEngineVersion.VER_13_6,
+        }),
+        parameters: {
+            max_connections: '10000',
+            password_encryption: 'md5',
+        },
+    });
+
     // //////////////////////////////////////////////
     // //////////////////////////////////////////////
     // //////////////////////////////////////////////
@@ -68,28 +79,59 @@ export default function makeRds(
 
     const rdsClusterPort = 5432;
 
-    const rdsCluster = new ServerlessCluster(scope, `${Constants.APP_NAME}${Constants.getStageName()}RDSServerlessCluster`, {
-        engine: DatabaseClusterEngine.AURORA_POSTGRESQL,
-        parameterGroup: ParameterGroup.fromParameterGroupName(scope, 'ParameterGroup', 'default.aurora-postgresql10'),
-        clusterIdentifier: `${Constants.APP_NAME}${Constants.getStageName()}RDSServerlessCluster`,
-        credentials: Credentials.fromSecret(rdsSecret),
-        defaultDatabaseName: `${Constants.APP_NAME}${Constants.getStageName()}`,
-        enableDataApi: true,
-        removalPolicy: RemovalPolicy.DESTROY,
-        scaling: {
-            minCapacity: AuroraCapacityUnit.ACU_2,
-            maxCapacity: AuroraCapacityUnit.ACU_4,
+    const rdsCluster = new DatabaseCluster(scope, `${Constants.APP_NAME}${Constants.getStageName()}RDSCluster`, {
+        engine: DatabaseClusterEngine.auroraPostgres({
+            version: AuroraPostgresEngineVersion.VER_13_6,
+        }),
+        instanceProps: {
+            vpc,
+            enablePerformanceInsights: true,
+
+            instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MICRO),
+            parameterGroup: rdsParameterGroup,
+            performanceInsightEncryptionKey: rdsKmsKey,
+            publiclyAccessible: false,
+            securityGroups: [
+                rdsSecurityGroup,
+            ],
+            vpcSubnets: {
+                subnetType: SubnetType.PRIVATE_WITH_NAT,
+            },
         },
-        securityGroups: [
-            rdsSecurityGroup,
-        ],
+        clusterIdentifier: `${Constants.APP_NAME}${Constants.getStageName()}RDSCluster`,
+        defaultDatabaseName: `${Constants.APP_NAME}${Constants.getStageName()}`,
+        instances: 1,
+        port: rdsClusterPort,
+        removalPolicy: RemovalPolicy.DESTROY,
         storageEncryptionKey: rdsKmsKey,
         subnetGroup: rdsSubnetGroup,
-        vpc,
-        vpcSubnets: {
-            subnetType: SubnetType.PRIVATE_WITH_NAT,
-        },
     });
+
+    // const rdsCluster = new ServerlessCluster(scope, `${Constants.APP_NAME}
+    // ${Constants.getStageName()}RDSServerlessCluster`, {
+    //     engine: DatabaseClusterEngine.AURORA_POSTGRESQL,
+    //     parameterGroup: ParameterGroup.fromParameterGroupName(scope,
+    //     'ParameterGroup', 'default.aurora-postgresql10'),
+    //     clusterIdentifier: `${Constants.APP_NAME}${Constants
+    //     .getStageName()}rdsserverlesscluster`,
+    //     credentials: Credentials.fromSecret(rdsSecret),
+    //     defaultDatabaseName: `${Constants.APP_NAME}${Constants.getStageName()}`,
+    //     enableDataApi: true,
+    //     removalPolicy: RemovalPolicy.DESTROY,
+    //     scaling: {
+    //         minCapacity: AuroraCapacityUnit.ACU_2,
+    //         maxCapacity: AuroraCapacityUnit.ACU_4,
+    //     },
+    //     securityGroups: [
+    //         rdsSecurityGroup,
+    //     ],
+    //     storageEncryptionKey: rdsKmsKey,
+    //     subnetGroup: rdsSubnetGroup,
+    //     vpc,
+    //     vpcSubnets: {
+    //         subnetType: SubnetType.PRIVATE_WITH_NAT,
+    //     },
+    // });
 
     // //////////////////////////////////////////////
     // //////////////////////////////////////////////
