@@ -20,7 +20,7 @@ export default class AphroditePipelineStack extends Stack {
                     'master',
                     {
                         connectionArn:
-                            'arn:aws:codestar-connections:us-east-1:200400004453:connection/f706a3ab-dec5-4a50-9152-ad1f695605f6',
+                            'arn:aws:codestar-connections:us-east-1:200400004453:connection/5be6584b-5c78-407a-91e9-bcc4c053c5e9',
                     }
                 ),
                 installCommands: [
