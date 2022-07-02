@@ -21,6 +21,7 @@ export default class PipelineStack extends Stack {
                     {
                         connectionArn:
                             `arn:aws:codestar-connections:${Stack.of(this).region}:${Stack.of(this).account}:connection/${Constants.getCodeStarId()}`,
+                        triggerOnPush: true,
                     }
                 ),
                 installCommands: [
