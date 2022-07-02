@@ -6,6 +6,7 @@ import {
     AuroraCapacityUnit,
     Credentials,
     DatabaseClusterEngine,
+    ParameterGroup,
     ServerlessCluster,
     SubnetGroup,
 } from 'aws-cdk-lib/aws-rds';
@@ -69,6 +70,7 @@ export default function makeRds(
 
     const rdsCluster = new ServerlessCluster(scope, `${Constants.APP_NAME}${Constants.getStageName()}RDSServerlessCluster`, {
         engine: DatabaseClusterEngine.AURORA_POSTGRESQL,
+        parameterGroup: ParameterGroup.fromParameterGroupName(scope, 'ParameterGroup', 'default.aurora-postgresql10'),
         clusterIdentifier: `${Constants.APP_NAME}${Constants.getStageName()}RDSServerlessCluster`,
         credentials: Credentials.fromSecret(rdsSecret),
         defaultDatabaseName: `${Constants.APP_NAME}${Constants.getStageName()}`,
