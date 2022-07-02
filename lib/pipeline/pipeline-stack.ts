@@ -1,26 +1,26 @@
 import {Stack, StackProps} from 'aws-cdk-lib';
 import {Construct} from 'constructs';
 import {CodeBuildStep, CodePipeline, CodePipelineSource} from 'aws-cdk-lib/pipelines';
-import AphroditePipelineStage from './pipeline-stage';
+import PipelineStage from './pipeline-stage';
+import Constants from '../constants';
 
-export default class AphroditePipelineStack extends Stack {
+export default class PipelineStack extends Stack {
     constructor(
         scope: Construct,
         id: string,
-        appName: string,
         props?: StackProps
     ) {
         super(scope, id, props);
 
-        const pipeline = new CodePipeline(this, `${appName}Pipeline`, {
-            pipelineName: `${appName}Pipeline`,
+        const pipeline = new CodePipeline(this, `${Constants.APP_NAME}Pipeline`, {
+            pipelineName: `${Constants.APP_NAME}Pipeline`,
             synth: new CodeBuildStep('SynthStep', {
                 input: CodePipelineSource.connection(
                     'ksco92/aphrodite',
                     'master',
                     {
                         connectionArn:
-                            'arn:aws:codestar-connections:us-east-1:200400004453:connection/5be6584b-5c78-407a-91e9-bcc4c053c5e9',
+                            `arn:aws:codestar-connections:${Stack.of(this).region}:${Stack.of(this).account}:connection/${Constants.getCodeStarId()}`,
                     }
                 ),
                 installCommands: [
@@ -34,7 +34,7 @@ export default class AphroditePipelineStack extends Stack {
             }),
         });
 
-        const beta = new AphroditePipelineStage(this, `${appName}BetaDeployStage`, appName, 'beta');
-        pipeline.addStage(beta);
+        const stage = new PipelineStage(this, `${Constants.APP_NAME}${Constants.getStageName()}DeployStage`);
+        pipeline.addStage(stage);
     }
 }

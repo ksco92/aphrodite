@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import {App} from 'aws-cdk-lib';
-import AphroditePipelineStack from '../lib/pipeline-stack';
+import PipelineStack from '../lib/pipeline/pipeline-stack';
+import Constants from '../lib/constants';
 
 const app = new App();
-const appName = 'aphrodite';
-new AphroditePipelineStack(app, `${appName}PipelineStack`, appName, {
-    stackName: `${appName}MainStack`,
+new PipelineStack(app, `${Constants.APP_NAME}PipelineStack`, {
+    stackName: `${Constants.APP_NAME}MainStack`,
 });
