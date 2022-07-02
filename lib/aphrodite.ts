@@ -5,7 +5,8 @@ import makeHostedZones from './networking/hosted-zones';
 import Constants from './constants';
 import makeRds from './database/rds';
 import makeBastion from './networking/bastion';
-import makeLambda from "./lambda/lambda";
+import makeLambda from './lambda/lambda';
+import makeApiGateway from './api-gateway/api-gateway';
 
 export default class Aphrodite extends Construct {
     constructor(scope: Construct, id: string) {
@@ -35,6 +36,8 @@ export default class Aphrodite extends Construct {
         );
 
         const lambda = makeLambda(this, vpc);
+
+        makeApiGateway(this, lambda.functions);
 
         // Allow SSH from anywhere
         bastion.bastionSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(22));

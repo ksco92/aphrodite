@@ -31,6 +31,6 @@ def create_user(_, __):
             'isBase64Encoded': False,
             'statusCode': 500,
             'body': json.dumps({
-                'error': str(e)
+                'error': f'[ERROR]: {str(e)}'
             })
         }
