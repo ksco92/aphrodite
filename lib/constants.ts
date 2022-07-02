@@ -3,7 +3,7 @@ export default class Constants {
 
     // TODO: Change this to be dynamic based on the AWS account id
     static getCodeStarId() {
-        return '5be6584b-5c78-407a-91e9-bcc4c053c5e9';
+        return '3f38aaf9-45ad-4362-9b0e-c4a9ba646857';
     }
 
     // TODO: Change this to be dynamic based on the AWS account id
