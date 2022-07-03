@@ -10,9 +10,12 @@ import {
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import * as fs from 'fs';
 import Constants from '../constants';
+import {CnameRecord, HostedZone} from 'aws-cdk-lib/aws-route53';
+import {Duration} from 'aws-cdk-lib';
 
 export default function makeApiGateway(
     scope: Construct,
+    publicHostedZone: HostedZone,
     functions: Function[]
 ) {
     const api = new LambdaRestApi(scope, `${Constants.APP_NAME}${Constants.getStageName()}API`, {
@@ -64,5 +67,18 @@ export default function makeApiGateway(
     api.deploymentStage = new Stage(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIStage`, {
         deployment,
         stageName: Constants.getStageName(),
+    });
+
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // DNS assignment
+
+    new CnameRecord(scope, `${Constants.APP_NAME}${Constants.getStageName()}BastionCNAME`, {
+        domainName: api.url,
+        zone: publicHostedZone,
+        recordName: `api.${publicHostedZone.zoneName}`,
+        ttl: Duration.seconds(60),
     });
 }
