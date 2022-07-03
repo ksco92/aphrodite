@@ -6,6 +6,7 @@ import * as path from 'path';
 import makeCreateUser from './create-user';
 import Constants from '../constants';
 import makeGetUser from './get-user';
+import makeAddMarker from './add-marker';
 
 export default function makeLambda(
     scope: Construct,
@@ -44,12 +45,21 @@ export default function makeLambda(
         mainRequirementsLayer
     );
 
+    const addMarker = makeAddMarker(
+        scope,
+        vpc,
+        lambdaRole,
+        lambdaSecurityGroup,
+        mainRequirementsLayer
+    );
+
     return {
         lambdaRole,
         lambdaSecurityGroup,
         functions: [
             createUser,
             getUser,
+            addMarker,
         ],
     };
 }

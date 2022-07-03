@@ -1,5 +1,11 @@
 import {Construct} from 'constructs';
-import {Deployment, LambdaIntegration, LambdaRestApi, Model, PassthroughBehavior,} from 'aws-cdk-lib/aws-apigateway';
+import {
+    Deployment,
+    LambdaIntegration,
+    LambdaRestApi,
+    Model,
+    PassthroughBehavior,
+} from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import * as fs from 'fs';
 import {ARecord, HostedZone, RecordTarget} from 'aws-cdk-lib/aws-route53';
@@ -133,6 +139,58 @@ export default function makeApiGateway(
     });
 
     getUserGetMethod.addMethodResponse({
+        statusCode: '400',
+        responseModels: {
+            'application/json': Model.EMPTY_MODEL,
+        },
+    });
+
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // Add marker
+
+    const addMarkerResource = api.root.addResource('add_marker');
+
+    const addMarkerIntegration = new LambdaIntegration(functions[2], {
+        proxy: true,
+        integrationResponses: [
+            {
+                statusCode: '500',
+                selectionPattern: '.*[ERROR].*',
+            },
+            {
+                statusCode: '200',
+            },
+            {
+                statusCode: '400',
+                selectionPattern: '.*[BAD_REQUEST].*',
+            },
+        ],
+        passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH,
+        requestTemplates: {
+            'application/json': requestTemplate,
+        },
+    });
+
+    const addMarkerPostMethod = addMarkerResource.addMethod('POST', addMarkerIntegration);
+
+    addMarkerPostMethod.addMethodResponse({
+        statusCode: '500',
+        responseModels: {
+            'application/json': Model.EMPTY_MODEL,
+        },
+    });
+
+    addMarkerPostMethod.addMethodResponse({
+        statusCode: '200',
+        responseModels: {
+            'application/json': Model.EMPTY_MODEL,
+        },
+    });
+
+    addMarkerPostMethod.addMethodResponse({
         statusCode: '400',
         responseModels: {
             'application/json': Model.EMPTY_MODEL,
