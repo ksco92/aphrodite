@@ -24,11 +24,10 @@ export default function makeApiGateway(
     const api = new LambdaRestApi(scope, `${Constants.APP_NAME}${Constants.getStageName()}API`, {
         proxy: false,
         handler: functions[0],
-    });
-
-    new DomainName(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIDomainName`, {
-        certificate,
-        domainName: `apig.${domainName}`,
+        domainName: {
+            certificate,
+            domainName: `apig2.${domainName}`,
+        },
     });
 
     const requestTemplate = fs.readFileSync('./lib/api-gateway/mapping_template.txt', 'utf8');
