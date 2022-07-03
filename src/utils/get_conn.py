@@ -21,7 +21,7 @@ def get_conn(secret_name: str) -> Connection:
         dbname = 'aphrodite_local'
         port = 5432
 
-    db_url = f'postgresql+pg8000://{username}:{password}@{host}:{port}/{dbname}'
+    db_url = f'postgresql+psycopg2://{username}:{password}@{host}:{port}/{dbname}'
     engine = create_engine(db_url)
     conn = engine.connect()
 
