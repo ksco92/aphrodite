@@ -31,10 +31,10 @@ export default function makeCreateUser(
         ],
         role: lambdaRole,
         functionName: `${Constants.APP_NAME}${Constants.getStageName()}AphroditeCreateUser`,
-        memorySize: 10240,
+        memorySize: 128,
         environment: {
             SecretName: `${Constants.APP_NAME}${Constants.getStageName()}/rds/${Constants.APP_NAME}${Constants.getStageName()}`,
         },
-        timeout: Duration.minutes(15),
+        timeout: Duration.minutes(1),
     });
 }

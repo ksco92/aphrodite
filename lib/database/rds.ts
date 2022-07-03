@@ -6,12 +6,13 @@ import {HostedZone} from 'aws-cdk-lib/aws-route53';
 import {Key} from 'aws-cdk-lib/aws-kms';
 import {
     AuroraPostgresEngineVersion,
+    Credentials,
     DatabaseCluster,
     DatabaseClusterEngine,
     ParameterGroup,
     SubnetGroup,
 } from 'aws-cdk-lib/aws-rds';
-import {Secret, SecretRotation, SecretRotationApplication} from 'aws-cdk-lib/aws-secretsmanager';
+import {Secret} from 'aws-cdk-lib/aws-secretsmanager';
 import {Duration, RemovalPolicy} from 'aws-cdk-lib';
 import Constants from '../constants';
 
@@ -103,14 +104,13 @@ export default function makeRds(
         removalPolicy: RemovalPolicy.DESTROY,
         storageEncryptionKey: rdsKmsKey,
         subnetGroup: rdsSubnetGroup,
+        parameterGroup: rdsParameterGroup,
+        credentials: Credentials.fromSecret(rdsSecret),
+        monitoringInterval: Duration.seconds(5),
     });
 
     // Rotate master credentials every week
-    new SecretRotation(scope, `${Constants.APP_NAME}${Constants.getStageName()}RDSClusterSecretRotation`, {
-        application: SecretRotationApplication.POSTGRES_ROTATION_SINGLE_USER,
-        secret: rdsSecret,
-        target: rdsCluster,
-        vpc,
+    rdsCluster.addRotationSingleUser({
         excludeCharacters: '/@," ',
         automaticallyAfter: Duration.days(7),
     });
