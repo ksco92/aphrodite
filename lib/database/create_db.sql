@@ -21,6 +21,10 @@ create table aphrodite.marker_types
     primary key (marker_type_id)
 );
 
+insert into aphrodite.marker_types (marker_type_id, marker_type_name)
+VALUES (1, 'RED'),
+       (2, 'BLUE');
+
 create table aphrodite.operations
 (
     operation_id   bigint,
@@ -28,9 +32,13 @@ create table aphrodite.operations
     primary key (operation_id)
 );
 
+insert into aphrodite.operations (operation_id, operation_name)
+VALUES (1, 'ADD'),
+       (2, 'REMOVE');
+
 create table aphrodite.markers
 (
-    marker_id         bigint,
+    marker_id         serial,
     created_timestamp timestamp default now(),
     user_hash         varchar(256),
     marker_date       date,
