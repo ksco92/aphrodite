@@ -1,11 +1,11 @@
 import json
 import os
 
-from lambdas.create_user import create_user
 from utils.get_conn import get_conn
 from utils.get_query_results import get_query_results
 from utils.valid_marker_type_id import valid_marker_type_id
 from utils.valid_operation_id import valid_operation_id
+from utils.valid_user_hash import valid_user_hash
 
 
 def add_marker(event, _):
@@ -35,6 +35,9 @@ def add_marker(event, _):
 
         if not valid_operation_id(conn, operation_id):
             raise ValueError('Invalid value for operation_id.')
+
+        if not valid_user_hash(conn, user_hash):
+            raise ValueError('Invalid value for user_hash.')
 
         insert_query = f"""insert into aphrodite.markers 
         (user_hash, marker_date, operation_id, marker_type_id)

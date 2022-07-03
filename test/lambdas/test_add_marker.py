@@ -70,3 +70,15 @@ def test_invalid_missing_param(event):
     assert '[BAD_REQUEST]' in json.loads(response['body'])['error']
     assert 'is required in the body' in json.loads(response['body'])['error']
     assert response['statusCode'] == 400
+
+
+def test_invalid_user_hash(event):
+    event['body'] = json.loads(event['body'])
+    event['body']['user_hash'] = 'some invalid user hash'
+    event['body'] = json.dumps(event['body'])
+
+    response = add_marker(event, 'a')
+    assert isinstance(response, dict)
+    assert '[BAD_REQUEST]' in json.loads(response['body'])['error']
+    assert 'Invalid value' in json.loads(response['body'])['error']
+    assert response['statusCode'] == 400

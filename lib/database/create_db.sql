@@ -44,7 +44,10 @@ create table aphrodite.markers
     marker_date       date,
     operation_id      bigint,
     marker_type_id    bigint,
-    primary key (marker_id)
+    primary key (marker_id),
+    foreign key (user_hash) references aphrodite.users (user_hash),
+    foreign key (operation_id) references aphrodite.operations (operation_id),
+    foreign key (marker_type_id) references aphrodite.marker_types (marker_type_id)
 );
 
 create index markers_marker_date on aphrodite.markers (marker_date);
