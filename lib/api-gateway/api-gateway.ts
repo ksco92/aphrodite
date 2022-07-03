@@ -1,6 +1,6 @@
 import {Construct} from 'constructs';
 import {
-    Deployment,
+    Deployment, DomainName,
     LambdaIntegration,
     LambdaRestApi,
     Model,
@@ -11,16 +11,24 @@ import {Function} from 'aws-cdk-lib/aws-lambda';
 import * as fs from 'fs';
 import {CnameRecord, HostedZone} from 'aws-cdk-lib/aws-route53';
 import {Duration} from 'aws-cdk-lib';
+import {Certificate} from 'aws-cdk-lib/aws-certificatemanager';
 import Constants from '../constants';
 
 export default function makeApiGateway(
     scope: Construct,
     publicHostedZone: HostedZone,
-    functions: Function[]
+    functions: Function[],
+    certificate: Certificate,
+    domainName: string
 ) {
     const api = new LambdaRestApi(scope, `${Constants.APP_NAME}${Constants.getStageName()}API`, {
         proxy: false,
         handler: functions[0],
+    });
+
+    new DomainName(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIDomainName`, {
+        certificate,
+        domainName: `apig.${domainName}`,
     });
 
     const createUserResource = api.root.addResource('create_user');
@@ -67,18 +75,5 @@ export default function makeApiGateway(
     api.deploymentStage = new Stage(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIStage`, {
         deployment,
         stageName: Constants.getStageName(),
-    });
-
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // DNS assignment
-
-    new CnameRecord(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIGCNAME`, {
-        domainName: api.url.split('/')[2],
-        zone: publicHostedZone,
-        recordName: `api.${publicHostedZone.zoneName}`,
-        ttl: Duration.seconds(60),
     });
 }

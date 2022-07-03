@@ -7,6 +7,7 @@ import makeRds from './database/rds';
 import makeBastion from './networking/bastion';
 import makeLambda from './lambda/lambda';
 import makeApiGateway from './api-gateway/api-gateway';
+import makeCertificate from './networking/certificate';
 
 export default class Aphrodite extends Construct {
     constructor(scope: Construct, id: string) {
@@ -24,6 +25,8 @@ export default class Aphrodite extends Construct {
 
         const hostedZones = makeHostedZones(this, domainName);
 
+        const certificate = makeCertificate(scope, domainName, hostedZones.publicHostedZone);
+
         const rds = makeRds(this, vpc, hostedZones.publicHostedZone);
 
         const bastion = makeBastion(
@@ -37,7 +40,13 @@ export default class Aphrodite extends Construct {
 
         const lambda = makeLambda(this, vpc);
 
-        makeApiGateway(this, hostedZones.publicHostedZone, lambda.functions);
+        makeApiGateway(
+            this,
+            hostedZones.publicHostedZone,
+            lambda.functions,
+            certificate,
+            domainName
+        );
 
         // Allow SSH from anywhere
         bastion.bastionSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(22));
