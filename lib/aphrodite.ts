@@ -37,7 +37,7 @@ export default class Aphrodite extends Construct {
 
         const lambda = makeLambda(this, vpc);
 
-        makeApiGateway(this, lambda.functions);
+        makeApiGateway(this, hostedZones.publicHostedZone, lambda.functions);
 
         // Allow SSH from anywhere
         bastion.bastionSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(22));
