@@ -1,6 +1,7 @@
 import {Construct} from 'constructs';
 import {
-    Deployment, DomainName,
+    Deployment,
+    DomainName,
     LambdaIntegration,
     LambdaRestApi,
     Model,
@@ -9,8 +10,7 @@ import {
 } from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import * as fs from 'fs';
-import {CnameRecord, HostedZone} from 'aws-cdk-lib/aws-route53';
-import {Duration} from 'aws-cdk-lib';
+import {HostedZone} from 'aws-cdk-lib/aws-route53';
 import {Certificate} from 'aws-cdk-lib/aws-certificatemanager';
 import Constants from '../constants';
 
