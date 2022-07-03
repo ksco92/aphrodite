@@ -1,6 +1,11 @@
 import {Construct} from 'constructs';
 import {
-    Deployment, LambdaIntegration, LambdaRestApi, Model, PassthroughBehavior,
+    Deployment,
+    LambdaIntegration,
+    LambdaRestApi,
+    Model,
+    PassthroughBehavior,
+    Stage,
 } from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import * as fs from 'fs';
@@ -52,7 +57,12 @@ export default function makeApiGateway(
         },
     });
 
-    new Deployment(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIDeployment`, {
+    const deployment = new Deployment(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIDeployment`, {
         api,
+    });
+
+    api.deploymentStage = new Stage(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIStage`, {
+        deployment,
+        stageName: Constants.getStageName(),
     });
 }
