@@ -9,9 +9,9 @@ import {
 } from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import * as fs from 'fs';
-import Constants from '../constants';
 import {CnameRecord, HostedZone} from 'aws-cdk-lib/aws-route53';
 import {Duration} from 'aws-cdk-lib';
+import Constants from '../constants';
 
 export default function makeApiGateway(
     scope: Construct,
@@ -75,7 +75,7 @@ export default function makeApiGateway(
     // //////////////////////////////////////////////
     // DNS assignment
 
-    new CnameRecord(scope, `${Constants.APP_NAME}${Constants.getStageName()}BastionCNAME`, {
+    new CnameRecord(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIGCNAME`, {
         domainName: api.url,
         zone: publicHostedZone,
         recordName: `api.${publicHostedZone.zoneName}`,
