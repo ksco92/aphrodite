@@ -33,7 +33,7 @@ def get_user(event, __):
                 'isBase64Encoded': False,
                 'statusCode': 404,
                 'body': json.dumps({
-                    'error': 'User not found.'
+                    'error': '[NOT_FOUND]: User not found.'
                 })
             }
 

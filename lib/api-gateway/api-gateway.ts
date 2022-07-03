@@ -31,9 +31,15 @@ export default function makeApiGateway(
         domainName: `apig.${domainName}`,
     });
 
-    const createUserResource = api.root.addResource('create_user');
-
     const requestTemplate = fs.readFileSync('./lib/api-gateway/mapping_template.txt', 'utf8');
+
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // Create user
+
+    const createUserResource = api.root.addResource('create_user');
 
     const createUserIntegration = new LambdaIntegration(functions[0], {
         proxy: true,
@@ -52,21 +58,79 @@ export default function makeApiGateway(
         },
     });
 
-    const postMethod = createUserResource.addMethod('POST', createUserIntegration);
+    const createUserPostMethod = createUserResource.addMethod('POST', createUserIntegration);
 
-    postMethod.addMethodResponse({
+    createUserPostMethod.addMethodResponse({
         statusCode: '500',
         responseModels: {
             'application/json': Model.EMPTY_MODEL,
         },
     });
 
-    postMethod.addMethodResponse({
+    createUserPostMethod.addMethodResponse({
         statusCode: '200',
         responseModels: {
             'application/json': Model.EMPTY_MODEL,
         },
     });
+
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // Get user
+
+    const getUserResource = api.root.addResource('get_user');
+
+    const getUserIntegration = new LambdaIntegration(functions[1], {
+        proxy: true,
+        integrationResponses: [
+            {
+                statusCode: '500',
+                selectionPattern: '.*[ERROR].*',
+            },
+            {
+                statusCode: '200',
+            },
+            {
+                statusCode: '404',
+                selectionPattern: '.*[NOT_FOUND].*',
+            },
+        ],
+        passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH,
+        requestTemplates: {
+            'application/json': requestTemplate,
+        },
+    });
+
+    const getUserGetMethod = getUserResource.addMethod('GET', getUserIntegration);
+
+    getUserGetMethod.addMethodResponse({
+        statusCode: '500',
+        responseModels: {
+            'application/json': Model.EMPTY_MODEL,
+        },
+    });
+
+    getUserGetMethod.addMethodResponse({
+        statusCode: '200',
+        responseModels: {
+            'application/json': Model.EMPTY_MODEL,
+        },
+    });
+
+    getUserGetMethod.addMethodResponse({
+        statusCode: '404',
+        responseModels: {
+            'application/json': Model.EMPTY_MODEL,
+        },
+    });
+
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // Deployment
 
     const deployment = new Deployment(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIDeployment`, {
         api,
