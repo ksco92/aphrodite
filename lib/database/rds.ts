@@ -67,7 +67,7 @@ export default function makeRds(
         securityGroupName: `${Constants.APP_NAME}${Constants.getStageName()}RDSSecurityGroup`,
     });
 
-    const rdsParameterGroup = new ParameterGroup(scope, `${Constants.APP_NAME}${Constants.getStageName()}RDSParameterGroup`, {
+    const rdsParameterGroup = new ParameterGroup(scope, `${Constants.APP_NAME}${Constants.getStageName()}RDSPGParameterGroup`, {
         engine: DatabaseInstanceEngine.postgres({
             version: PostgresEngineVersion.VER_14_1,
         }),
@@ -108,10 +108,10 @@ export default function makeRds(
     });
 
     // Rotate master credentials every week
-    rdsInstance.addRotationSingleUser({
-        excludeCharacters: '/@," ',
-        automaticallyAfter: Duration.days(7),
-    });
+    // rdsInstance.addRotationSingleUser({
+    //     excludeCharacters: '/@," ',
+    //     automaticallyAfter: Duration.days(7),
+    // });
 
     // //////////////////////////////////////////////
     // //////////////////////////////////////////////
