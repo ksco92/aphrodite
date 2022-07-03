@@ -67,7 +67,6 @@ export default function makeRds(
         }),
         parameters: {
             max_connections: '10000',
-            password_encryption: 'md5',
         },
     });
 
