@@ -89,7 +89,6 @@ export default function makeRds(
             instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MEDIUM),
             parameterGroup: rdsParameterGroup,
             performanceInsightEncryptionKey: rdsKmsKey,
-            publiclyAccessible: false,
             securityGroups: [
                 rdsSecurityGroup,
             ],
