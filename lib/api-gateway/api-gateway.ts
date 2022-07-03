@@ -1,11 +1,6 @@
 import {Construct} from 'constructs';
 import {
-    Deployment,
-    LambdaIntegration,
-    LambdaRestApi,
-    Model,
-    PassthroughBehavior,
-    Stage,
+    Deployment, LambdaIntegration, LambdaRestApi, Model, PassthroughBehavior,
 } from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import * as fs from 'fs';
@@ -28,22 +23,16 @@ export default function makeApiGateway(
         handler: functions[0],
         domainName: {
             certificate,
-            domainName: `apig2.${domainName}`,
-            basePath: Constants.getStageName(),
+            domainName: `api.${domainName}`,
         },
     });
 
-    const deployment = new Deployment(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIDeployment`, {
+    new Deployment(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIDeployment`, {
         api,
     });
 
-    api.deploymentStage = new Stage(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIStage`, {
-        deployment,
-        stageName: Constants.getStageName(),
-    });
-
     new ARecord(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIARecord`, {
-        recordName: `apig2.${domainName}`,
+        recordName: `api.${domainName}`,
         zone: publicHostedZone,
         target: RecordTarget.fromAlias(new ApiGateway(api)),
     });
