@@ -85,7 +85,7 @@ export default function makeRds(
         instanceProps: {
             vpc,
             enablePerformanceInsights: true,
-            instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MICRO),
+            instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MEDIUM),
             parameterGroup: rdsParameterGroup,
             performanceInsightEncryptionKey: rdsKmsKey,
             publiclyAccessible: false,
