@@ -16,7 +16,5 @@ def test_create_user():
     assert response['statusCode'] == 200
 
     new_users = get_query_results(conn, 'select count(*) as users from aphrodite.users')[0]['users']
-    print(users)
-    print(new_users)
 
     assert users + 1 == new_users
