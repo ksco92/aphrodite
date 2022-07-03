@@ -30,8 +30,8 @@ export default class Aphrodite extends Construct {
             this,
             vpc,
             rds.rdsSecurityGroup,
-            rds.rdsClusterPort,
-            rds.rdsCluster.clusterEndpoint.hostname,
+            rds.rdsInstancePort,
+            rds.rdsInstance.instanceEndpoint.hostname,
             hostedZones.publicHostedZone
         );
 
@@ -41,16 +41,16 @@ export default class Aphrodite extends Construct {
 
         // Allow SSH from anywhere
         bastion.bastionSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(22));
-        bastion.bastionSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(rds.rdsClusterPort));
+        bastion.bastionSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(rds.rdsInstancePort));
 
         rds.rdsSecurityGroup.addIngressRule(
             bastion.bastionSecurityGroup,
-            Port.tcp(rds.rdsClusterPort)
+            Port.tcp(rds.rdsInstancePort)
         );
 
         rds.rdsSecurityGroup.addIngressRule(
             lambda.lambdaSecurityGroup,
-            Port.tcp(rds.rdsClusterPort)
+            Port.tcp(rds.rdsInstancePort)
         );
 
         rds.rdsSecret.grantRead(lambda.lambdaRole);

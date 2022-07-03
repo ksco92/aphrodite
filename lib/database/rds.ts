@@ -1,19 +1,24 @@
 import {Construct} from 'constructs';
 import {
-    InstanceClass, InstanceSize, InstanceType, SecurityGroup, SubnetType, Vpc,
+    InstanceClass,
+    InstanceSize,
+    InstanceType,
+    SecurityGroup,
+    SubnetType,
+    Vpc,
 } from 'aws-cdk-lib/aws-ec2';
 import {HostedZone} from 'aws-cdk-lib/aws-route53';
 import {Key} from 'aws-cdk-lib/aws-kms';
 import {
-    AuroraPostgresEngineVersion,
     Credentials,
-    DatabaseCluster,
-    DatabaseClusterEngine,
+    DatabaseInstance,
+    DatabaseInstanceEngine,
     ParameterGroup,
+    PostgresEngineVersion,
     SubnetGroup,
 } from 'aws-cdk-lib/aws-rds';
 import {Secret} from 'aws-cdk-lib/aws-secretsmanager';
-import {Duration, RemovalPolicy} from 'aws-cdk-lib';
+import {Duration} from 'aws-cdk-lib';
 import Constants from '../constants';
 
 export default function makeRds(
@@ -63,8 +68,8 @@ export default function makeRds(
     });
 
     const rdsParameterGroup = new ParameterGroup(scope, `${Constants.APP_NAME}${Constants.getStageName()}RDSParameterGroup`, {
-        engine: DatabaseClusterEngine.auroraPostgres({
-            version: AuroraPostgresEngineVersion.VER_13_6,
+        engine: DatabaseInstanceEngine.postgres({
+            version: PostgresEngineVersion.VER_14_1,
         }),
         parameters: {
             max_connections: '10000',
@@ -77,69 +82,36 @@ export default function makeRds(
     // //////////////////////////////////////////////
     // DB instance
 
-    const rdsClusterPort = 5432;
+    const rdsInstancePort = 5432;
 
-    const rdsCluster = new DatabaseCluster(scope, `${Constants.APP_NAME}${Constants.getStageName()}RDSCluster2`, {
-        engine: DatabaseClusterEngine.auroraPostgres({
-            version: AuroraPostgresEngineVersion.VER_13_6,
+    const rdsInstance = new DatabaseInstance(scope, `${Constants.APP_NAME}${Constants.getStageName()}RDSInstance`, {
+        engine: DatabaseInstanceEngine.postgres({
+            version: PostgresEngineVersion.VER_14_1,
         }),
-        instanceProps: {
-            vpc,
-            enablePerformanceInsights: true,
-            instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MEDIUM),
-            parameterGroup: rdsParameterGroup,
-            performanceInsightEncryptionKey: rdsKmsKey,
-            securityGroups: [
-                rdsSecurityGroup,
-            ],
-            vpcSubnets: {
-                subnetType: SubnetType.PRIVATE_WITH_NAT,
-            },
-            publiclyAccessible: true,
-        },
-        clusterIdentifier: `${Constants.APP_NAME}${Constants.getStageName()}RDSCluster2`,
-        defaultDatabaseName: `${Constants.APP_NAME}${Constants.getStageName()}`,
-        instances: 1,
-        port: rdsClusterPort,
-        removalPolicy: RemovalPolicy.DESTROY,
+        vpc,
+        allocatedStorage: 10,
+        credentials: Credentials.fromSecret(rdsSecret),
+        databaseName: `${Constants.APP_NAME}${Constants.getStageName()}`,
+        instanceIdentifier: `${Constants.APP_NAME}${Constants.getStageName()}`,
+        instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MICRO),
+        port: rdsInstancePort,
+        securityGroups: [
+            rdsSecurityGroup,
+        ],
         storageEncryptionKey: rdsKmsKey,
         subnetGroup: rdsSubnetGroup,
+        vpcSubnets: {
+            subnetType: SubnetType.PRIVATE_WITH_NAT,
+        },
         parameterGroup: rdsParameterGroup,
-        credentials: Credentials.fromSecret(rdsSecret),
         monitoringInterval: Duration.seconds(5),
     });
 
     // Rotate master credentials every week
-    rdsCluster.addRotationSingleUser({
+    rdsInstance.addRotationSingleUser({
         excludeCharacters: '/@," ',
         automaticallyAfter: Duration.days(7),
     });
-
-    // const rdsCluster = new ServerlessCluster(scope, `${Constants.APP_NAME}
-    // ${Constants.getStageName()}RDSServerlessCluster`, {
-    //     engine: DatabaseClusterEngine.AURORA_POSTGRESQL,
-    //     parameterGroup: ParameterGroup.fromParameterGroupName(scope,
-    //     'ParameterGroup', 'default.aurora-postgresql10'),
-    //     clusterIdentifier: `${Constants.APP_NAME}${Constants
-    //     .getStageName()}rdsserverlesscluster`,
-    //     credentials: Credentials.fromSecret(rdsSecret),
-    //     defaultDatabaseName: `${Constants.APP_NAME}${Constants.getStageName()}`,
-    //     enableDataApi: true,
-    //     removalPolicy: RemovalPolicy.DESTROY,
-    //     scaling: {
-    //         minCapacity: AuroraCapacityUnit.ACU_2,
-    //         maxCapacity: AuroraCapacityUnit.ACU_4,
-    //     },
-    //     securityGroups: [
-    //         rdsSecurityGroup,
-    //     ],
-    //     storageEncryptionKey: rdsKmsKey,
-    //     subnetGroup: rdsSubnetGroup,
-    //     vpc,
-    //     vpcSubnets: {
-    //         subnetType: SubnetType.PRIVATE_WITH_NAT,
-    //     },
-    // });
 
     // //////////////////////////////////////////////
     // //////////////////////////////////////////////
@@ -147,9 +119,9 @@ export default function makeRds(
     // //////////////////////////////////////////////
 
     return {
-        rdsCluster,
+        rdsInstance,
         rdsSecurityGroup,
-        rdsClusterPort,
+        rdsInstancePort,
         rdsSecret,
     };
 }

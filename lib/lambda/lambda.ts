@@ -5,6 +5,7 @@ import {Code, LayerVersion} from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
 import makeCreateUser from './create-user';
 import Constants from '../constants';
+import makeGetUser from './get-user';
 
 export default function makeLambda(
     scope: Construct,
@@ -35,11 +36,20 @@ export default function makeLambda(
         mainRequirementsLayer
     );
 
+    const getUser = makeGetUser(
+        scope,
+        vpc,
+        lambdaRole,
+        lambdaSecurityGroup,
+        mainRequirementsLayer
+    );
+
     return {
         lambdaRole,
         lambdaSecurityGroup,
         functions: [
             createUser,
+            getUser,
         ],
     };
 }
