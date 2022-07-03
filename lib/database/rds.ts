@@ -79,7 +79,7 @@ export default function makeRds(
 
     const rdsClusterPort = 5432;
 
-    const rdsCluster = new DatabaseCluster(scope, `${Constants.APP_NAME}${Constants.getStageName()}RDSCluster`, {
+    const rdsCluster = new DatabaseCluster(scope, `${Constants.APP_NAME}${Constants.getStageName()}RDSCluster1`, {
         engine: DatabaseClusterEngine.auroraPostgres({
             version: AuroraPostgresEngineVersion.VER_13_6,
         }),
@@ -95,9 +95,8 @@ export default function makeRds(
             vpcSubnets: {
                 subnetType: SubnetType.PRIVATE_WITH_NAT,
             },
-            publiclyAccessible: true,
         },
-        clusterIdentifier: `${Constants.APP_NAME}${Constants.getStageName()}RDSCluster`,
+        clusterIdentifier: `${Constants.APP_NAME}${Constants.getStageName()}RDSCluster1`,
         defaultDatabaseName: `${Constants.APP_NAME}${Constants.getStageName()}`,
         instances: 1,
         port: rdsClusterPort,
