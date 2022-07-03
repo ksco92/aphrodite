@@ -76,7 +76,7 @@ export default function makeApiGateway(
     // DNS assignment
 
     new CnameRecord(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIGCNAME`, {
-        domainName: api.url,
+        domainName: api.url.split('/')[2],
         zone: publicHostedZone,
         recordName: `api.${publicHostedZone.zoneName}`,
         ttl: Duration.seconds(60),
