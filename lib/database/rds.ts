@@ -11,7 +11,7 @@ import {
     ParameterGroup,
     SubnetGroup,
 } from 'aws-cdk-lib/aws-rds';
-import {Secret} from 'aws-cdk-lib/aws-secretsmanager';
+import {Secret, SecretRotation, SecretRotationApplication} from 'aws-cdk-lib/aws-secretsmanager';
 import {Duration, RemovalPolicy} from 'aws-cdk-lib';
 import Constants from '../constants';
 
@@ -106,9 +106,13 @@ export default function makeRds(
     });
 
     // Rotate master credentials every week
-    rdsCluster.addRotationSingleUser({
+    new SecretRotation(scope, `${Constants.APP_NAME}${Constants.getStageName()}RDSClusterSecretRotation`, {
+        application: SecretRotationApplication.POSTGRES_ROTATION_SINGLE_USER,
+        secret: rdsSecret,
+        target: rdsCluster,
+        vpc,
+        excludeCharacters: '/@," ',
         automaticallyAfter: Duration.days(7),
-        excludeCharacters: '/@" ',
     });
 
     // const rdsCluster = new ServerlessCluster(scope, `${Constants.APP_NAME}
