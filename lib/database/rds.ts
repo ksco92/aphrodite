@@ -95,6 +95,7 @@ export default function makeRds(
             vpcSubnets: {
                 subnetType: SubnetType.PRIVATE_WITH_NAT,
             },
+            publiclyAccessible: true,
         },
         clusterIdentifier: `${Constants.APP_NAME}${Constants.getStageName()}RDSCluster`,
         defaultDatabaseName: `${Constants.APP_NAME}${Constants.getStageName()}`,
