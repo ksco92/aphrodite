@@ -31,7 +31,7 @@ export default function makeCreateUser(
         ],
         role: lambdaRole,
         functionName: `${Constants.APP_NAME}${Constants.getStageName()}AphroditeCreateUser`,
-        memorySize: 512,
+        memorySize: Constants.LAMBDA_MEMORY,
         environment: {
             SecretName: `${Constants.APP_NAME}${Constants.getStageName()}/rds/${Constants.APP_NAME}${Constants.getStageName()}`,
         },
