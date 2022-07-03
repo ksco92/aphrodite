@@ -12,7 +12,7 @@ import {
     SubnetGroup,
 } from 'aws-cdk-lib/aws-rds';
 import {Secret} from 'aws-cdk-lib/aws-secretsmanager';
-import {RemovalPolicy} from 'aws-cdk-lib';
+import {Duration, RemovalPolicy} from 'aws-cdk-lib';
 import Constants from '../constants';
 
 export default function makeRds(
@@ -103,6 +103,12 @@ export default function makeRds(
         removalPolicy: RemovalPolicy.DESTROY,
         storageEncryptionKey: rdsKmsKey,
         subnetGroup: rdsSubnetGroup,
+    });
+
+    // Rotate master credentials every week
+    rdsCluster.addRotationSingleUser({
+        automaticallyAfter: Duration.days(7),
+        excludeCharacters: '/@" ',
     });
 
     // const rdsCluster = new ServerlessCluster(scope, `${Constants.APP_NAME}
