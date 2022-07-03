@@ -1,7 +1,5 @@
 import {Construct} from 'constructs';
-import {
-    Deployment, LambdaIntegration, LambdaRestApi, Model, PassthroughBehavior,
-} from 'aws-cdk-lib/aws-apigateway';
+import {Deployment, LambdaIntegration, LambdaRestApi, Model, PassthroughBehavior,} from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import * as fs from 'fs';
 import {ARecord, HostedZone, RecordTarget} from 'aws-cdk-lib/aws-route53';
@@ -100,6 +98,10 @@ export default function makeApiGateway(
                 statusCode: '404',
                 selectionPattern: '.*[NOT_FOUND].*',
             },
+            {
+                statusCode: '400',
+                selectionPattern: '.*[BAD_REQUEST].*',
+            },
         ],
         passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH,
         requestTemplates: {
@@ -125,6 +127,13 @@ export default function makeApiGateway(
 
     getUserGetMethod.addMethodResponse({
         statusCode: '404',
+        responseModels: {
+            'application/json': Model.EMPTY_MODEL,
+        },
+    });
+
+    getUserGetMethod.addMethodResponse({
+        statusCode: '400',
         responseModels: {
             'application/json': Model.EMPTY_MODEL,
         },
