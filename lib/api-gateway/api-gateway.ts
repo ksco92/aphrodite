@@ -29,6 +29,7 @@ export default function makeApiGateway(
         domainName: {
             certificate,
             domainName: `apig2.${domainName}`,
+            basePath: Constants.getStageName(),
         },
     });
 
