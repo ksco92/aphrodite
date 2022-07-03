@@ -1,7 +1,6 @@
 import {Construct} from 'constructs';
 import {
     Deployment,
-    DomainName,
     LambdaIntegration,
     LambdaRestApi,
     Model,
@@ -10,8 +9,9 @@ import {
 } from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import * as fs from 'fs';
-import {HostedZone} from 'aws-cdk-lib/aws-route53';
+import {ARecord, HostedZone, RecordTarget} from 'aws-cdk-lib/aws-route53';
 import {Certificate} from 'aws-cdk-lib/aws-certificatemanager';
+import {ApiGateway} from 'aws-cdk-lib/aws-route53-targets';
 import Constants from '../constants';
 
 export default function makeApiGateway(
@@ -21,6 +21,8 @@ export default function makeApiGateway(
     certificate: Certificate,
     domainName: string
 ) {
+    const requestTemplate = fs.readFileSync('./lib/api-gateway/mapping_template.txt', 'utf8');
+
     const api = new LambdaRestApi(scope, `${Constants.APP_NAME}${Constants.getStageName()}API`, {
         proxy: false,
         handler: functions[0],
@@ -30,7 +32,20 @@ export default function makeApiGateway(
         },
     });
 
-    const requestTemplate = fs.readFileSync('./lib/api-gateway/mapping_template.txt', 'utf8');
+    const deployment = new Deployment(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIDeployment`, {
+        api,
+    });
+
+    api.deploymentStage = new Stage(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIStage`, {
+        deployment,
+        stageName: Constants.getStageName(),
+    });
+
+    new ARecord(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIARecord`, {
+        recordName: `apig2.${domainName}`,
+        zone: publicHostedZone,
+        target: RecordTarget.fromAlias(new ApiGateway(api)),
+    });
 
     // //////////////////////////////////////////////
     // //////////////////////////////////////////////
@@ -123,20 +138,5 @@ export default function makeApiGateway(
         responseModels: {
             'application/json': Model.EMPTY_MODEL,
         },
-    });
-
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // Deployment
-
-    const deployment = new Deployment(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIDeployment`, {
-        api,
-    });
-
-    api.deploymentStage = new Stage(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIStage`, {
-        deployment,
-        stageName: Constants.getStageName(),
     });
 }
