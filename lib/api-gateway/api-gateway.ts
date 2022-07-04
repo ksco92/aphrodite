@@ -45,196 +45,76 @@ export default function makeApiGateway(
     // //////////////////////////////////////////////
     // //////////////////////////////////////////////
     // //////////////////////////////////////////////
-    // Create user
+    // Create resources
 
-    const createUserResource = api.root.addResource('create_user');
+    const functionsAndPaths = [
+        {
+            path: 'create_user',
+            method: 'POST',
+            lambda: functions[0],
+        },
+        {
+            path: 'get_user',
+            method: 'GET',
+            lambda: functions[1],
+        },
+        {
+            path: 'add_marker',
+            method: 'POST',
+            lambda: functions[2],
+        },
+        {
+            path: 'get_calendar',
+            method: 'GET',
+            lambda: functions[3],
+        },
+    ];
 
-    const createUserIntegration = new LambdaIntegration(functions[0], {
-        proxy: true,
-        integrationResponses: [
-            {
-                statusCode: '500',
-                selectionPattern: '.*[ERROR].*',
+    functionsAndPaths.forEach((func) => {
+        const resource = api.root.addResource(func.path);
+
+        const integration = new LambdaIntegration(func.lambda, {
+            proxy: true,
+            integrationResponses: [
+                {
+                    statusCode: '500',
+                    selectionPattern: '.*[ERROR].*',
+                },
+                {
+                    statusCode: '400',
+                    selectionPattern: '.*[BAD_REQUEST].*',
+                },
+                {
+                    statusCode: '200',
+                },
+            ],
+            passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH,
+            requestTemplates: {
+                'application/json': requestTemplate,
             },
-            {
-                statusCode: '200',
+        });
+
+        const method = resource.addMethod(func.method, integration);
+
+        method.addMethodResponse({
+            statusCode: '500',
+            responseModels: {
+                'application/json': Model.EMPTY_MODEL,
             },
-        ],
-        passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH,
-        requestTemplates: {
-            'application/json': requestTemplate,
-        },
-    });
+        });
 
-    const createUserPostMethod = createUserResource.addMethod('POST', createUserIntegration);
-
-    createUserPostMethod.addMethodResponse({
-        statusCode: '500',
-        responseModels: {
-            'application/json': Model.EMPTY_MODEL,
-        },
-    });
-
-    createUserPostMethod.addMethodResponse({
-        statusCode: '200',
-        responseModels: {
-            'application/json': Model.EMPTY_MODEL,
-        },
-    });
-
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // Get user
-
-    const getUserResource = api.root.addResource('get_user');
-
-    const getUserIntegration = new LambdaIntegration(functions[1], {
-        proxy: true,
-        integrationResponses: [
-            {
-                statusCode: '500',
-                selectionPattern: '.*[ERROR].*',
+        method.addMethodResponse({
+            statusCode: '400',
+            responseModels: {
+                'application/json': Model.EMPTY_MODEL,
             },
-            {
-                statusCode: '200',
+        });
+
+        method.addMethodResponse({
+            statusCode: '200',
+            responseModels: {
+                'application/json': Model.EMPTY_MODEL,
             },
-            {
-                statusCode: '400',
-                selectionPattern: '.*[BAD_REQUEST].*',
-            },
-        ],
-        passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH,
-        requestTemplates: {
-            'application/json': requestTemplate,
-        },
-    });
-
-    const getUserGetMethod = getUserResource.addMethod('GET', getUserIntegration);
-
-    getUserGetMethod.addMethodResponse({
-        statusCode: '500',
-        responseModels: {
-            'application/json': Model.EMPTY_MODEL,
-        },
-    });
-
-    getUserGetMethod.addMethodResponse({
-        statusCode: '200',
-        responseModels: {
-            'application/json': Model.EMPTY_MODEL,
-        },
-    });
-
-    getUserGetMethod.addMethodResponse({
-        statusCode: '400',
-        responseModels: {
-            'application/json': Model.EMPTY_MODEL,
-        },
-    });
-
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // Add marker
-
-    const addMarkerResource = api.root.addResource('add_marker');
-
-    const addMarkerIntegration = new LambdaIntegration(functions[2], {
-        proxy: true,
-        integrationResponses: [
-            {
-                statusCode: '500',
-                selectionPattern: '.*[ERROR].*',
-            },
-            {
-                statusCode: '200',
-            },
-            {
-                statusCode: '400',
-                selectionPattern: '.*[BAD_REQUEST].*',
-            },
-        ],
-        passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH,
-        requestTemplates: {
-            'application/json': requestTemplate,
-        },
-    });
-
-    const addMarkerPostMethod = addMarkerResource.addMethod('POST', addMarkerIntegration);
-
-    addMarkerPostMethod.addMethodResponse({
-        statusCode: '500',
-        responseModels: {
-            'application/json': Model.EMPTY_MODEL,
-        },
-    });
-
-    addMarkerPostMethod.addMethodResponse({
-        statusCode: '200',
-        responseModels: {
-            'application/json': Model.EMPTY_MODEL,
-        },
-    });
-
-    addMarkerPostMethod.addMethodResponse({
-        statusCode: '400',
-        responseModels: {
-            'application/json': Model.EMPTY_MODEL,
-        },
-    });
-
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-    // Get calendar
-
-    const getCalendarResource = api.root.addResource('get_calendar');
-
-    const getCalendarIntegration = new LambdaIntegration(functions[3], {
-        proxy: true,
-        integrationResponses: [
-            {
-                statusCode: '500',
-                selectionPattern: '.*[ERROR].*',
-            },
-            {
-                statusCode: '200',
-            },
-            {
-                statusCode: '400',
-                selectionPattern: '.*[BAD_REQUEST].*',
-            },
-        ],
-        passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH,
-        requestTemplates: {
-            'application/json': requestTemplate,
-        },
-    });
-
-    const getCalendarGetMethod = getCalendarResource.addMethod('GET', getCalendarIntegration);
-
-    getCalendarGetMethod.addMethodResponse({
-        statusCode: '500',
-        responseModels: {
-            'application/json': Model.EMPTY_MODEL,
-        },
-    });
-
-    getCalendarGetMethod.addMethodResponse({
-        statusCode: '200',
-        responseModels: {
-            'application/json': Model.EMPTY_MODEL,
-        },
-    });
-
-    getCalendarGetMethod.addMethodResponse({
-        statusCode: '400',
-        responseModels: {
-            'application/json': Model.EMPTY_MODEL,
-        },
+        });
     });
 }
