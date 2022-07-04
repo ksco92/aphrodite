@@ -6,6 +6,9 @@ from utils.get_secret import get_secret
 
 
 def get_conn(secret_name: str) -> Connection:
+    if not isinstance(secret_name, str):
+        raise ValueError('Parameter secret_name must be of type str.')
+
     if am_i_lambda():
         secret = get_secret(secret_name)
         username = secret['username']
