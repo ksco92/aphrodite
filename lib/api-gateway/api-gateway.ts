@@ -205,7 +205,7 @@ export default function makeApiGateway(
 
     const getCalendarResource = api.root.addResource('get_calendar');
 
-    const getCalendarIntegration = new LambdaIntegration(functions[2], {
+    const getCalendarIntegration = new LambdaIntegration(functions[3], {
         proxy: true,
         integrationResponses: [
             {
