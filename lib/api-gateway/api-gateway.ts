@@ -101,10 +101,6 @@ export default function makeApiGateway(
                 statusCode: '200',
             },
             {
-                statusCode: '404',
-                selectionPattern: '.*[NOT_FOUND].*',
-            },
-            {
                 statusCode: '400',
                 selectionPattern: '.*[BAD_REQUEST].*',
             },
@@ -126,13 +122,6 @@ export default function makeApiGateway(
 
     getUserGetMethod.addMethodResponse({
         statusCode: '200',
-        responseModels: {
-            'application/json': Model.EMPTY_MODEL,
-        },
-    });
-
-    getUserGetMethod.addMethodResponse({
-        statusCode: '404',
         responseModels: {
             'application/json': Model.EMPTY_MODEL,
         },
