@@ -31,24 +31,16 @@ all these resources starting from `bin/aphrodite.ts`.
 
 ```json
 {
-    "user_hash": "a new user hash"
+    "user_hash": "a_new_user_hash"
 }
 ```
 
 #### `/get_user`
 * **Method:** `GET`
 * **Inputs:**
-  * User hash as a query string. 
-  * User hashes use a lot of special characters, so you will have to do something like this to encode it:
-
-```python
-import urllib.parse
-safe_string = urllib.parse.quote_plus(...)
-print(safe_string)
-```
-And then send the request as `/get_user?user_hash=the_encoded_hash`.
-
-  * **Outputs:**
+  * User hash as a query string like this:
+    * `/get_user?user_hash=the_encoded_hash`
+* **Outputs:**
 
 ```json
 {
@@ -82,11 +74,50 @@ And then send the request as `/get_user?user_hash=the_encoded_hash`.
 }
 ```
 
+#### `/get_calendar`
+* **Method:** `GET`
+* **Inputs:**
+  * User hash as a query string like this:
+    * `/get_calendar?user_hash=the_encoded_hash`
+* **Outputs:**
+
+```json
+{
+    "calendar": [
+        {
+            "calendar_date": "2022-01-01",
+            "user": "the_user_hash",
+            "has_red_marker": 1,
+            "has_blue_marker": 0
+        },
+        {
+            "calendar_date": "2022-01-02",
+            "user": "the_user_hash",
+            "has_red_marker": 1,
+            "has_blue_marker": 0
+        }
+    ]
+}
+```
+
 ### Database
 
 ![entity relation diagram](doc_img/er_diagram.jpg)
 
 Creation of all the DB objects is in `lib/database/create_db.sql`
+
+### Special notes
+
+#### Encode a user hash
+
+User hashes use a lot of special characters, you can encode them to pass them in a URL
+doing something like this:
+
+```python
+import urllib.parse
+safe_string = urllib.parse.quote_plus('the_user_hash')
+print(safe_string)
+```
 
 
 
