@@ -1,7 +1,7 @@
-from utils.get_conn import get_conn
 import os
 from datetime import datetime
 
+from utils.get_conn import get_conn
 from utils.get_query_results import get_query_results
 
 

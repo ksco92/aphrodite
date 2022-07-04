@@ -48,8 +48,10 @@ export default function makeBastion(
     // Bastion instance
 
     let userDataScript = readFileSync('./lib/networking/bastion-user-data.sh', 'utf-8');
-    userDataScript = userDataScript.split('<actual_postgres_port>').join(rdsPort.toString());
-    userDataScript = userDataScript.split('<actual_postgres_endpoint>').join(rdsEndPoint);
+    userDataScript = userDataScript.split('<actual_postgres_port>')
+        .join(rdsPort.toString());
+    userDataScript = userDataScript.split('<actual_postgres_endpoint>')
+        .join(rdsEndPoint);
 
     const instance = new Instance(scope, `${Constants.APP_NAME}${Constants.getStageName()}Bastion`, {
         instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.NANO),

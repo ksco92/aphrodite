@@ -7,6 +7,7 @@ import makeCreateUser from './create-user';
 import Constants from '../constants';
 import makeGetUser from './get-user';
 import makeAddMarker from './add-marker';
+import makeGetCalendar from './get-calendar';
 
 export default function makeLambda(
     scope: Construct,
@@ -53,6 +54,14 @@ export default function makeLambda(
         mainRequirementsLayer
     );
 
+    const getCalendar = makeGetCalendar(
+        scope,
+        vpc,
+        lambdaRole,
+        lambdaSecurityGroup,
+        mainRequirementsLayer
+    );
+
     return {
         lambdaRole,
         lambdaSecurityGroup,
@@ -60,6 +69,7 @@ export default function makeLambda(
             createUser,
             getUser,
             addMarker,
+            getCalendar,
         ],
     };
 }

@@ -196,4 +196,56 @@ export default function makeApiGateway(
             'application/json': Model.EMPTY_MODEL,
         },
     });
+
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // Get calendar
+
+    const getCalendarResource = api.root.addResource('get_calendar');
+
+    const getCalendarIntegration = new LambdaIntegration(functions[2], {
+        proxy: true,
+        integrationResponses: [
+            {
+                statusCode: '500',
+                selectionPattern: '.*[ERROR].*',
+            },
+            {
+                statusCode: '200',
+            },
+            {
+                statusCode: '400',
+                selectionPattern: '.*[BAD_REQUEST].*',
+            },
+        ],
+        passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH,
+        requestTemplates: {
+            'application/json': requestTemplate,
+        },
+    });
+
+    const getCalendarGetMethod = getCalendarResource.addMethod('GET', getCalendarIntegration);
+
+    getCalendarGetMethod.addMethodResponse({
+        statusCode: '500',
+        responseModels: {
+            'application/json': Model.EMPTY_MODEL,
+        },
+    });
+
+    getCalendarGetMethod.addMethodResponse({
+        statusCode: '200',
+        responseModels: {
+            'application/json': Model.EMPTY_MODEL,
+        },
+    });
+
+    getCalendarGetMethod.addMethodResponse({
+        statusCode: '400',
+        responseModels: {
+            'application/json': Model.EMPTY_MODEL,
+        },
+    });
 }
