@@ -8,7 +8,7 @@ from lambdas.get_calendar import get_calendar
 
 
 @pytest.fixture
-def event():
+def user_hash():
     response = create_user('a', 'a')
     user_hash = json.loads(response['body'])['user_hash']
     add_marker({
@@ -38,15 +38,12 @@ def event():
         })
     }, 'a')
 
-    return {
-        'body': json.dumps({
-            'user_hash': user_hash,
-        })
-    }
+    return user_hash
 
 
-def test_get_calendar(event):
-    response = get_calendar(event, 'a')
+def test_get_calendar(user_hash):
+    test_event = {'multiValueQueryStringParameters': {'user_hash': [user_hash]}}
+    response = get_calendar(test_event, 'a')
 
     assert isinstance(response, dict)
     print(json.loads(response['body']))
@@ -54,25 +51,27 @@ def test_get_calendar(event):
     assert response['statusCode'] == 200
 
 
-def test_invalid_missing_param(event):
-    event['body'] = json.loads(event['body'])
-    del event['body']['user_hash']
-    event['body'] = json.dumps(event['body'])
+def test_get_calendar_no_hash(user_hash):
+    test_events = [
+        {'multiValueQueryStringParameters': {'invalid_key_name': [user_hash]}},
+        {'some_other_invalid_key': {'invalid_key_name': [user_hash]}},
+    ]
 
-    response = get_calendar(event, 'a')
+    for event in test_events:
+        response = get_calendar(event, 1)
+
+        assert isinstance(response, dict)
+        assert 'error' in json.loads(response['body'])
+        assert '[BAD_REQUEST]' in json.loads(response['body'])['error']
+        assert response['statusCode'] == 400
+
+
+def test_get_calendar_invalid_hash():
+    test_event = {'multiValueQueryStringParameters': {'user_hash': ['this is a totally invalid hash']}}
+
+    response = get_calendar(test_event, 1)
+
     assert isinstance(response, dict)
+    assert 'error' in json.loads(response['body'])
     assert '[BAD_REQUEST]' in json.loads(response['body'])['error']
-    assert 'is required in the body' in json.loads(response['body'])['error']
-    assert response['statusCode'] == 400
-
-
-def test_invalid_user_hash(event):
-    event['body'] = json.loads(event['body'])
-    event['body']['user_hash'] = 'some invalid user hash'
-    event['body'] = json.dumps(event['body'])
-
-    response = get_calendar(event, 'a')
-    assert isinstance(response, dict)
-    assert '[BAD_REQUEST]' in json.loads(response['body'])['error']
-    assert 'Invalid value' in json.loads(response['body'])['error']
     assert response['statusCode'] == 400

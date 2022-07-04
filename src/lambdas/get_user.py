@@ -3,6 +3,7 @@ import os
 
 from utils.get_conn import get_conn
 from utils.get_query_results import get_query_results
+from utils.valid_user_hash import valid_user_hash
 
 
 def get_user(event, __):
@@ -17,6 +18,9 @@ def get_user(event, __):
 
         conn = get_conn(os.environ.get('SecretName'))
 
+        if not valid_user_hash(conn, user_hash):
+            raise ValueError('Invalid value for user_hash.')
+
         select_query = f'''
         select * from aphrodite.users where user_hash = '{user_hash}'
         '''
@@ -25,26 +29,13 @@ def get_user(event, __):
 
         conn.close()
 
-        if len(results) == 1:
-            return {
-                'isBase64Encoded': False,
-                'statusCode': 200,
-                'body': json.dumps({
-                    'user': results
-                }, default=str)
-            }
-
-        elif len(results) == 0:
-            return {
-                'isBase64Encoded': False,
-                'statusCode': 404,
-                'body': json.dumps({
-                    'error': '[NOT_FOUND]: User not found.'
-                })
-            }
-
-        else:
-            raise Exception('There seems to be more than one result for this user.')
+        return {
+            'isBase64Encoded': False,
+            'statusCode': 200,
+            'body': json.dumps({
+                'user': results
+            }, default=str)
+        }
 
     except ValueError as e:
         return {

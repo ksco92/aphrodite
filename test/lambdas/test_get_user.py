@@ -47,5 +47,5 @@ def test_get_user_invalid_hash():
 
     assert isinstance(response, dict)
     assert 'error' in json.loads(response['body'])
-    assert '[NOT_FOUND]' in json.loads(response['body'])['error']
-    assert response['statusCode'] == 404
+    assert '[BAD_REQUEST]' in json.loads(response['body'])['error']
+    assert response['statusCode'] == 400

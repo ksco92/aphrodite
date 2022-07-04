@@ -8,17 +8,13 @@ from utils.valid_user_hash import valid_user_hash
 
 def get_calendar(event, _):
     try:
-        mandatory_params = [
-            'user_hash',
-        ]
+        if 'multiValueQueryStringParameters' not in event:
+            raise ValueError('Query string user_hash is needed for this request.')
 
-        body = json.loads(event['body'])
+        if 'user_hash' not in event['multiValueQueryStringParameters']:
+            raise ValueError('Query string user_hash is needed for this request.')
 
-        for param in mandatory_params:
-            if param not in body:
-                raise ValueError(f'Parameter {param} is required in the body of this operation.')
-
-        user_hash = body['user_hash']
+        user_hash = event['multiValueQueryStringParameters']['user_hash'][0]
 
         conn = get_conn(os.environ.get('SecretName'))
 
