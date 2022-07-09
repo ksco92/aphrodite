@@ -2,12 +2,14 @@ import {BlockPublicAccess, Bucket} from 'aws-cdk-lib/aws-s3';
 import {Key} from 'aws-cdk-lib/aws-kms';
 import {Construct} from 'constructs';
 import {RemovalPolicy, Stack} from 'aws-cdk-lib';
-import {AllowedMethods, Distribution, OriginAccessIdentity, ViewerProtocolPolicy} from 'aws-cdk-lib/aws-cloudfront';
+import {
+    AllowedMethods, Distribution, OriginAccessIdentity, ViewerProtocolPolicy,
+} from 'aws-cdk-lib/aws-cloudfront';
 import {S3Origin} from 'aws-cdk-lib/aws-cloudfront-origins';
 import {Certificate} from 'aws-cdk-lib/aws-certificatemanager';
 import {ARecord, HostedZone, RecordTarget} from 'aws-cdk-lib/aws-route53';
+import {CloudFrontTarget} from 'aws-cdk-lib/aws-route53-targets';
 import Constants from '../constants';
-import {CloudFrontTarget} from "aws-cdk-lib/aws-route53-targets";
 
 export default function makeUi(
     scope: Construct,
