@@ -8,6 +8,7 @@ import makeBastion from './networking/bastion';
 import makeLambda from './lambda/lambda';
 import makeApiGateway from './api-gateway/api-gateway';
 import makeCertificate from './networking/certificate';
+import makeUi from './ui/ui';
 
 export default class Aphrodite extends Construct {
     constructor(scope: Construct, id: string) {
@@ -27,7 +28,7 @@ export default class Aphrodite extends Construct {
 
         const certificate = makeCertificate(scope, domainName, hostedZones.publicHostedZone);
 
-        // makeUi(scope, certificate, hostedZones.publicHostedZone);
+        makeUi(scope, certificate, hostedZones.publicHostedZone);
 
         const rds = makeRds(this, vpc, hostedZones.publicHostedZone);
 
