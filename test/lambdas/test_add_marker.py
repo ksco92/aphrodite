@@ -82,3 +82,10 @@ def test_invalid_user_hash(event):
     assert '[BAD_REQUEST]' in json.loads(response['body'])['error']
     assert 'Invalid value' in json.loads(response['body'])['error']
     assert response['statusCode'] == 400
+
+
+def test_fail():
+    response = add_marker({}, 'a')
+    assert response['statusCode'] == 500
+    assert '[ERROR]' in json.loads(response['body'])['error']
+

@@ -18,3 +18,14 @@ def test_create_user():
     new_users = get_query_results(conn, 'select count(*) as users from aphrodite.users')[0]['users']
 
     assert users + 1 == new_users
+
+
+def test_fail():
+    secret_name = os.environ.get('SecretName')
+    del os.environ['SecretName']
+    response = create_user('a', 'a')
+
+    assert response['statusCode'] == 500
+    assert '[ERROR]' in json.loads(response['body'])['error']
+
+    os.environ['SecretName'] = secret_name
