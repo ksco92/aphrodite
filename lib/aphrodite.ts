@@ -8,7 +8,6 @@ import makeBastion from './networking/bastion';
 import makeLambda from './lambda/lambda';
 import makeApiGateway from './api-gateway/api-gateway';
 import makeCertificate from './networking/certificate';
-import makeUi from "./ui/ui";
 
 export default class Aphrodite extends Construct {
     constructor(scope: Construct, id: string) {
