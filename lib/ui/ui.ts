@@ -2,7 +2,7 @@ import {BlockPublicAccess, Bucket, BucketAccessControl} from 'aws-cdk-lib/aws-s3
 import {Key} from 'aws-cdk-lib/aws-kms';
 import {Construct} from 'constructs';
 import {Duration, RemovalPolicy, Stack} from 'aws-cdk-lib';
-import {Distribution} from 'aws-cdk-lib/aws-cloudfront';
+import {Distribution, OriginAccessIdentity} from 'aws-cdk-lib/aws-cloudfront';
 import {S3Origin} from 'aws-cdk-lib/aws-cloudfront-origins';
 import {Certificate} from 'aws-cdk-lib/aws-certificatemanager';
 import {CnameRecord, HostedZone} from 'aws-cdk-lib/aws-route53';
@@ -26,6 +26,9 @@ export default function makeUi(
         removalPolicy: RemovalPolicy.DESTROY,
     });
 
+    const originAccessIdentity = new OriginAccessIdentity(scope, `${Constants.APP_NAME}${Constants.getStageName()}OriginAccessIdentity`);
+    uiBucket.grantRead(originAccessIdentity);
+
     const uiDistribution = new Distribution(scope, `${Constants.APP_NAME}${Constants.getStageName()}Distribution`, {
         defaultBehavior: {
             origin: new S3Origin(uiBucket),
@@ -34,6 +37,7 @@ export default function makeUi(
         domainNames: [
             publicHostedZone.zoneName,
         ],
+        defaultRootObject: 'index.html',
     });
 
     new CnameRecord(scope, `${Constants.APP_NAME}${Constants.getStageName()}DistributionCNAME`, {
