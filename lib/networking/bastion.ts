@@ -11,7 +11,7 @@ import {
     UserData,
     Vpc,
 } from 'aws-cdk-lib/aws-ec2';
-import {CnameRecord, HostedZone} from 'aws-cdk-lib/aws-route53';
+import {CnameRecord, IHostedZone} from 'aws-cdk-lib/aws-route53';
 import {Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {readFileSync} from 'fs';
 import {Duration} from 'aws-cdk-lib';
@@ -23,7 +23,7 @@ export default function makeBastion(
     rdsSecurityGroup: SecurityGroup,
     rdsPort: number,
     rdsEndPoint: string,
-    publicHostedZone: HostedZone
+    publicHostedZone: IHostedZone
 ) {
     // //////////////////////////////////////////////
     // //////////////////////////////////////////////

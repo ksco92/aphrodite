@@ -1,24 +1,19 @@
 import {Construct} from 'constructs';
 import {
-    Deployment,
-    LambdaIntegration,
-    LambdaRestApi,
-    Model,
-    PassthroughBehavior,
+    Deployment, LambdaIntegration, LambdaRestApi, Model, PassthroughBehavior,
 } from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import * as fs from 'fs';
-import {ARecord, HostedZone, RecordTarget} from 'aws-cdk-lib/aws-route53';
+import {ARecord, IHostedZone, RecordTarget} from 'aws-cdk-lib/aws-route53';
 import {Certificate} from 'aws-cdk-lib/aws-certificatemanager';
 import {ApiGateway} from 'aws-cdk-lib/aws-route53-targets';
 import Constants from '../constants';
 
 export default function makeApiGateway(
     scope: Construct,
-    publicHostedZone: HostedZone,
+    publicHostedZone: IHostedZone,
     functions: Function[],
-    certificate: Certificate,
-    domainName: string
+    certificate: Certificate
 ) {
     const requestTemplate = fs.readFileSync('./lib/api-gateway/mapping_template.txt', 'utf8');
 
@@ -27,7 +22,7 @@ export default function makeApiGateway(
         handler: functions[0],
         domainName: {
             certificate,
-            domainName: `api.${domainName}`,
+            domainName: `api.${publicHostedZone.zoneName}`,
         },
     });
 
@@ -36,7 +31,7 @@ export default function makeApiGateway(
     });
 
     new ARecord(scope, `${Constants.APP_NAME}${Constants.getStageName()}APIARecord`, {
-        recordName: `api.${domainName}`,
+        recordName: `api.${publicHostedZone.zoneName}`,
         zone: publicHostedZone,
         target: RecordTarget.fromAlias(new ApiGateway(api)),
     });

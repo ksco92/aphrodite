@@ -1,10 +1,11 @@
 import {Construct} from 'constructs';
-import {PublicHostedZone} from 'aws-cdk-lib/aws-route53';
+import {HostedZone} from 'aws-cdk-lib/aws-route53';
 import Constants from '../constants';
 
 export default function makeHostedZones(
     scope: Construct,
-    domainName: string
+    hostedZoneId: string,
+    zoneName: string
 ) {
     // //////////////////////////////////////////////
     // //////////////////////////////////////////////
@@ -12,8 +13,9 @@ export default function makeHostedZones(
     // //////////////////////////////////////////////
     // Public hosted zone
 
-    const publicHostedZone = new PublicHostedZone(scope, `${Constants.APP_NAME}${Constants.getStageName()}PublicHostedZone`, {
-        zoneName: domainName,
+    const publicHostedZone = HostedZone.fromHostedZoneAttributes(scope, `${Constants.APP_NAME}${Constants.getStageName()}PublicHostedZone`, {
+        hostedZoneId,
+        zoneName,
     });
 
     // //////////////////////////////////////////////

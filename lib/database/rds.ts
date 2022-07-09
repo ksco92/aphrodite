@@ -1,13 +1,8 @@
 import {Construct} from 'constructs';
 import {
-    InstanceClass,
-    InstanceSize,
-    InstanceType,
-    SecurityGroup,
-    SubnetType,
-    Vpc,
+    InstanceClass, InstanceSize, InstanceType, SecurityGroup, SubnetType, Vpc,
 } from 'aws-cdk-lib/aws-ec2';
-import {HostedZone} from 'aws-cdk-lib/aws-route53';
+import {IHostedZone} from 'aws-cdk-lib/aws-route53';
 import {Key} from 'aws-cdk-lib/aws-kms';
 import {
     Credentials,
@@ -24,7 +19,7 @@ import Constants from '../constants';
 export default function makeRds(
     scope: Construct,
     vpc: Vpc,
-    publicHostedZone: HostedZone
+    publicHostedZone: IHostedZone
 ) {
     // //////////////////////////////////////////////
     // //////////////////////////////////////////////

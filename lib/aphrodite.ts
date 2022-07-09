@@ -14,19 +14,22 @@ export default class Aphrodite extends Construct {
     constructor(scope: Construct, id: string) {
         super(scope, id);
 
-        let domainName = '';
+        let hostedZoneId: string;
+        let zoneName: string
 
         if (Constants.getStageName() === 'beta') {
-            domainName = `${Constants.getStageName()}aphrodite.ksco92.com`;
+            hostedZoneId = 'Z0107915AHWRL2UJR8GT';
+            zoneName = 'ksco92.com';
         } else {
-            domainName = 'aphrodite.ksco92.com';
+            hostedZoneId = 'Z0107915AHWRL2UJR8GT';
+            zoneName = 'ksco92.com';
         }
 
         const vpc = makeVpc(this);
 
-        const hostedZones = makeHostedZones(this, domainName);
+        const hostedZones = makeHostedZones(this, hostedZoneId, zoneName);
 
-        const certificate = makeCertificate(scope, domainName, hostedZones.publicHostedZone);
+        const certificate = makeCertificate(scope, hostedZones.publicHostedZone);
 
         makeUi(scope, certificate, hostedZones.publicHostedZone);
 
@@ -47,8 +50,7 @@ export default class Aphrodite extends Construct {
             this,
             hostedZones.publicHostedZone,
             lambda.functions,
-            certificate,
-            domainName
+            certificate
         );
 
         // Allow SSH from anywhere

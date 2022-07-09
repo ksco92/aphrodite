@@ -7,14 +7,14 @@ import {
 } from 'aws-cdk-lib/aws-cloudfront';
 import {S3Origin} from 'aws-cdk-lib/aws-cloudfront-origins';
 import {Certificate} from 'aws-cdk-lib/aws-certificatemanager';
-import {ARecord, HostedZone, RecordTarget} from 'aws-cdk-lib/aws-route53';
+import {ARecord, IHostedZone, RecordTarget} from 'aws-cdk-lib/aws-route53';
 import {CloudFrontTarget} from 'aws-cdk-lib/aws-route53-targets';
 import Constants from '../constants';
 
 export default function makeUi(
     scope: Construct,
     certificate: Certificate,
-    publicHostedZone: HostedZone
+    publicHostedZone: IHostedZone
 ) {
     const uiBucketKey = new Key(scope, `${Constants.APP_NAME}${Constants.getStageName()}UIBucketKMSKey`, {
         enableKeyRotation: true,
@@ -23,7 +23,7 @@ export default function makeUi(
     const uiBucket = new Bucket(scope, `${Constants.APP_NAME}${Constants.getStageName()}UIBucket`, {
         blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
         publicReadAccess: false,
-        bucketName: `${Constants.APP_NAME}-${Constants.getStageName()}-ui-${Stack.of(scope).account}-${Stack.of(scope).account}`,
+        bucketName: publicHostedZone.zoneName,
         encryptionKey: uiBucketKey,
         enforceSSL: true,
         removalPolicy: RemovalPolicy.DESTROY,
