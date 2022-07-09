@@ -39,11 +39,4 @@ export default function makeUi(
         ],
         defaultRootObject: 'index.html',
     });
-
-    new CnameRecord(scope, `${Constants.APP_NAME}${Constants.getStageName()}DistributionCNAME`, {
-        domainName: uiDistribution.distributionDomainName,
-        zone: publicHostedZone,
-        recordName: publicHostedZone.zoneName,
-        ttl: Duration.seconds(60),
-    });
 }
