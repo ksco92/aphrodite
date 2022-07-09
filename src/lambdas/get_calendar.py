@@ -1,31 +1,13 @@
 import json
-import os
 
-from utils.get_conn import get_conn
-from utils.get_query_results import get_query_results
-from utils.valid_user_hash import valid_user_hash
+from utils.get_data_with_user_hash import get_data_with_user_hash
 
 
 def get_calendar(event, _):
     try:
-        if 'multiValueQueryStringParameters' not in event:
-            raise ValueError('Query string user_hash is needed for this request.')
+        select_query = "select * from aphrodite.get_calendar('{}')"
 
-        if 'user_hash' not in event['multiValueQueryStringParameters']:
-            raise ValueError('Query string user_hash is needed for this request.')
-
-        user_hash = event['multiValueQueryStringParameters']['user_hash'][0]
-
-        conn = get_conn(os.environ.get('SecretName'))
-
-        if not valid_user_hash(conn, user_hash):
-            raise ValueError('Invalid value for user_hash.')
-
-        select_query = f"select * from aphrodite.get_calendar('{user_hash}')"
-
-        results = get_query_results(conn, select_query)
-
-        conn.close()
+        results = get_data_with_user_hash(event, select_query)
 
         return {
             'isBase64Encoded': False,
