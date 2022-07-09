@@ -1,4 +1,4 @@
-import {BlockPublicAccess, Bucket} from 'aws-cdk-lib/aws-s3';
+import {BlockPublicAccess, Bucket, BucketAccessControl} from 'aws-cdk-lib/aws-s3';
 import {Key} from 'aws-cdk-lib/aws-kms';
 import {Construct} from 'constructs';
 import {Duration, RemovalPolicy, Stack} from 'aws-cdk-lib';
@@ -19,11 +19,11 @@ export default function makeUi(
 
     const uiBucket = new Bucket(scope, `${Constants.APP_NAME}${Constants.getStageName()}UIBucket`, {
         blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+        accessControl: BucketAccessControl.PRIVATE,
         bucketName: `${Constants.APP_NAME}-${Constants.getStageName()}-ui-${Stack.of(scope).account}-${Stack.of(scope).account}`,
         encryptionKey: uiBucketKey,
         enforceSSL: true,
         removalPolicy: RemovalPolicy.DESTROY,
-        websiteIndexDocument: 'index.html',
     });
 
     const uiDistribution = new Distribution(scope, `${Constants.APP_NAME}${Constants.getStageName()}Distribution`, {
