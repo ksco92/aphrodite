@@ -43,7 +43,7 @@ export default function makeUi(
     });
 
     new ARecord(scope, `${Constants.APP_NAME}${Constants.getStageName()}DistributionARecord`, {
-        recordName: `${Constants.getStageName()}.${publicHostedZone.zoneName}`,
+        recordName: publicHostedZone.zoneName,
         target: RecordTarget.fromAlias(new CloudFrontTarget(uiDistribution)),
         zone: publicHostedZone,
     });
