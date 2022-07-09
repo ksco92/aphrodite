@@ -1,7 +1,7 @@
 import {BlockPublicAccess, Bucket} from 'aws-cdk-lib/aws-s3';
 import {Key} from 'aws-cdk-lib/aws-kms';
 import {Construct} from 'constructs';
-import {RemovalPolicy, Stack} from 'aws-cdk-lib';
+import {RemovalPolicy} from 'aws-cdk-lib';
 import {
     AllowedMethods, Distribution, OriginAccessIdentity, ViewerProtocolPolicy,
 } from 'aws-cdk-lib/aws-cloudfront';
@@ -9,6 +9,7 @@ import {S3Origin} from 'aws-cdk-lib/aws-cloudfront-origins';
 import {Certificate} from 'aws-cdk-lib/aws-certificatemanager';
 import {ARecord, IHostedZone, RecordTarget} from 'aws-cdk-lib/aws-route53';
 import {CloudFrontTarget} from 'aws-cdk-lib/aws-route53-targets';
+import {BucketDeployment, Source} from 'aws-cdk-lib/aws-s3-deployment';
 import Constants from '../constants';
 
 export default function makeUi(
@@ -51,5 +52,16 @@ export default function makeUi(
         recordName: `${Constants.getStageName()}.${publicHostedZone.zoneName}`,
         target: RecordTarget.fromAlias(new CloudFrontTarget(uiDistribution)),
         zone: publicHostedZone,
+    });
+
+    new BucketDeployment(scope, `${Constants.APP_NAME}${Constants.getStageName()}UIDeploymentCode`, {
+        sources: [
+            Source.asset('ui'),
+        ],
+        destinationBucket: uiBucket,
+        distribution: uiDistribution,
+        distributionPaths: [
+            '/*',
+        ],
     });
 }

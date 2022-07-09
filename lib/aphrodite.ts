@@ -15,7 +15,7 @@ export default class Aphrodite extends Construct {
         super(scope, id);
 
         let hostedZoneId: string;
-        let zoneName: string
+        let zoneName: string;
 
         if (Constants.getStageName() === 'beta') {
             hostedZoneId = 'Z0107915AHWRL2UJR8GT';
