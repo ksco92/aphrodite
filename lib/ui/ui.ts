@@ -1,10 +1,7 @@
-import {BlockPublicAccess, Bucket} from 'aws-cdk-lib/aws-s3';
-import {Key} from 'aws-cdk-lib/aws-kms';
+import {BlockPublicAccess, Bucket, BucketEncryption} from 'aws-cdk-lib/aws-s3';
 import {Construct} from 'constructs';
 import {RemovalPolicy} from 'aws-cdk-lib';
-import {
-    AllowedMethods, Distribution, OriginAccessIdentity, ViewerProtocolPolicy,
-} from 'aws-cdk-lib/aws-cloudfront';
+import {AllowedMethods, Distribution, OriginAccessIdentity, ViewerProtocolPolicy,} from 'aws-cdk-lib/aws-cloudfront';
 import {S3Origin} from 'aws-cdk-lib/aws-cloudfront-origins';
 import {Certificate} from 'aws-cdk-lib/aws-certificatemanager';
 import {ARecord, IHostedZone, RecordTarget} from 'aws-cdk-lib/aws-route53';
@@ -17,15 +14,11 @@ export default function makeUi(
     certificate: Certificate,
     publicHostedZone: IHostedZone
 ) {
-    const uiBucketKey = new Key(scope, `${Constants.APP_NAME}${Constants.getStageName()}UIBucketKMSKey`, {
-        enableKeyRotation: true,
-    });
-
     const uiBucket = new Bucket(scope, `${Constants.APP_NAME}${Constants.getStageName()}UIBucket`, {
         blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
         publicReadAccess: false,
         bucketName: publicHostedZone.zoneName,
-        encryptionKey: uiBucketKey,
+        encryption: BucketEncryption.S3_MANAGED,
         enforceSSL: true,
         removalPolicy: RemovalPolicy.DESTROY,
         autoDeleteObjects: true,
