@@ -28,6 +28,7 @@ export default function makeUi(
         encryptionKey: uiBucketKey,
         enforceSSL: true,
         removalPolicy: RemovalPolicy.DESTROY,
+        autoDeleteObjects: true,
     });
 
     const originAccessIdentity = new OriginAccessIdentity(scope, `${Constants.APP_NAME}${Constants.getStageName()}OriginAccessIdentity`);
