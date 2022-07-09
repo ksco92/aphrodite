@@ -28,7 +28,7 @@ export default class Aphrodite extends Construct {
 
         const certificate = makeCertificate(scope, domainName, hostedZones.publicHostedZone);
 
-        makeUi(scope, certificate, hostedZones.publicHostedZone);
+        // makeUi(scope, certificate, hostedZones.publicHostedZone);
 
         const rds = makeRds(this, vpc, hostedZones.publicHostedZone);
 
